@@ -10,7 +10,6 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <consoleFilterProvider implementation="com.github.orangain.jsonlogviewerplugin.providers.MyConsoleFilterProvider"/>
-        <toolWindow factoryClass="com.github.orangain.jsonlogviewerplugin.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
     </extensions>
 
     <applicationListeners>
