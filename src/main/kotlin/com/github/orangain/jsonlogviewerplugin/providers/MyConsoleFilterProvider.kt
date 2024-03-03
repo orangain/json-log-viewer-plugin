@@ -27,13 +27,13 @@ class MyConsoleFilterProvider : ConsoleFilterProvider {
 }
 
 class MyConsoleFilter : Filter {
+    private val textAttributesPairCache = mutableMapOf<String, Pair<TextAttributes, TextAttributes>>()
     override fun applyFilter(line: String, entireLength: Int): Filter.Result? {
         thisLogger().debug("entireLength: $entireLength, applyFilter: $line")
         val node = parseJson(line) ?: return null
 
-        val severity = node.get("severity")?.asText()
-        val textAttributes = textAttributesOf(severity)
-        val visitedTextAttributes = visitedTextAttributesOf(severity)
+        val severity = node.get("severity")?.asText()?.uppercase() ?: "DEFAULT"
+        val (textAttributes, visitedTextAttributes) = textAttributesPairOf(severity)
         return Filter.Result(
             entireLength - line.length,
             entireLength,
@@ -41,6 +41,12 @@ class MyConsoleFilter : Filter {
             textAttributes,
             visitedTextAttributes,
         )
+    }
+
+    private fun textAttributesPairOf(severity: String): Pair<TextAttributes, TextAttributes> {
+        return textAttributesPairCache.getOrPut(severity) {
+            Pair(textAttributesOf(severity), visitedTextAttributesOf(severity))
+        }
     }
 }
 
@@ -61,7 +67,7 @@ fun parseJson(text: String): JsonNode? {
     }
 }
 
-private fun textAttributesOf(severity: String?): TextAttributes {
+private fun textAttributesOf(severity: String): TextAttributes {
     // See: https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry#LogSeverity
     return when (severity) {
         "DEBUG" -> ConsoleHighlighter.GRAY.defaultAttributes
@@ -73,7 +79,7 @@ private fun textAttributesOf(severity: String?): TextAttributes {
     }
 }
 
-private fun visitedTextAttributesOf(severity: String?): TextAttributes {
+private fun visitedTextAttributesOf(severity: String): TextAttributes {
     val textAttributes = textAttributesOf(severity).clone()
     textAttributes.effectType = EffectType.LINE_UNDERSCORE
     textAttributes.effectColor = textAttributes.foregroundColor
