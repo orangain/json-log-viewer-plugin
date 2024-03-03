@@ -89,9 +89,15 @@ private fun visitedTextAttributesOf(severity: String): TextAttributes {
 
 class MyHyperlinkInfo(private val node: JsonNode) : HyperlinkInfo {
     override fun navigate(project: Project) {
+        val jsonString = mapper.writeValueAsString(node)
+            .replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+            .replace("\"", "&quot;")
+            .replace("'", "&apos;")
         val popup = JBPopupFactory.getInstance()
             .createHtmlTextBalloonBuilder(
-                "<pre style='white-space: pre-wrap'><code>${mapper.writeValueAsString(node)}</code></pre>",
+                "<pre style='white-space: pre-wrap'><code>$jsonString</code></pre>",
                 null,
                 MessageType.INFO.popupBackground,
                 null
