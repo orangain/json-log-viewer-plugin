@@ -9,6 +9,7 @@
     <resource-bundle>messages.MyBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
+        <consoleInputFilterProvider implementation="com.github.orangain.jsonlogviewerplugin.providers.MyConsoleInputFilterProvider"/>
         <consoleFilterProvider implementation="com.github.orangain.jsonlogviewerplugin.providers.MyConsoleFilterProvider"/>
     </extensions>
 
