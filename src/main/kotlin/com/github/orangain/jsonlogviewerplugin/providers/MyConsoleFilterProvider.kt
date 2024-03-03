@@ -97,6 +97,7 @@ class MyHyperlinkInfo(private val node: JsonNode) : HyperlinkInfo {
                 null
             )
             .setPointerSize(Dimension(1, 1)) // Don't show the arrow
+            .setCloseButtonEnabled(true)
             .createBalloon()
 
         val contentManager = RunContentManager.getInstance(project)
