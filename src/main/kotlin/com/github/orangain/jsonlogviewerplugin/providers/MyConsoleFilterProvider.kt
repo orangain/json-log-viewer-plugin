@@ -17,6 +17,7 @@ import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.MessageType
 import com.intellij.openapi.ui.popup.JBPopupFactory
+import java.awt.Color
 import java.awt.Dimension
 
 
@@ -91,7 +92,8 @@ class MyHyperlinkInfo(private val node: JsonNode) : HyperlinkInfo {
         val popup = JBPopupFactory.getInstance()
             .createHtmlTextBalloonBuilder(
                 "<pre><code>${mapper.writeValueAsString(node)}</code></pre>",
-                MessageType.INFO,
+                null,
+                MessageType.INFO.popupBackground,
                 null
             )
             .setPointerSize(Dimension(1, 1)) // Don't show the arrow
