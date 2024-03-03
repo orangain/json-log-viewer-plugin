@@ -8,9 +8,10 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.intellij.execution.filters.ConsoleFilterProvider
 import com.intellij.execution.filters.Filter
 import com.intellij.execution.filters.HyperlinkInfo
+import com.intellij.execution.process.ConsoleHighlighter
+import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.execution.ui.RunContentManager
 import com.intellij.openapi.diagnostic.thisLogger
-import com.intellij.openapi.editor.colors.CodeInsightColors
 import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.MessageType
@@ -58,11 +59,14 @@ fun parseJson(text: String): JsonNode? {
 }
 
 fun textAttributesOf(severity: String?): TextAttributes {
+    // See: https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry#LogSeverity
     return when (severity) {
-        "ERROR" -> CodeInsightColors.ERRORS_ATTRIBUTES.defaultAttributes
-        "WARN" -> CodeInsightColors.WARNINGS_ATTRIBUTES.defaultAttributes
-        "INFO" -> CodeInsightColors.INFORMATION_ATTRIBUTES.defaultAttributes
-        else -> CodeInsightColors.INFORMATION_ATTRIBUTES.defaultAttributes
+        "DEBUG" -> ConsoleHighlighter.GRAY.defaultAttributes
+        "INFO", "NOTICE" -> ConsoleViewContentType.NORMAL_OUTPUT_KEY.defaultAttributes
+        "WARNING" -> ConsoleHighlighter.YELLOW.defaultAttributes
+        "ERROR", "CRITICAL" -> ConsoleHighlighter.RED.defaultAttributes
+        "ALERT", "EMERGENCY" -> ConsoleHighlighter.RED_BRIGHT.defaultAttributes
+        else -> ConsoleViewContentType.NORMAL_OUTPUT_KEY.defaultAttributes
     }
 }
 
