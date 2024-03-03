@@ -80,10 +80,10 @@ private fun textAttributesOf(severity: String): TextAttributes {
 }
 
 private fun visitedTextAttributesOf(severity: String): TextAttributes {
-    val textAttributes = textAttributesOf(severity).clone()
-    textAttributes.effectType = EffectType.LINE_UNDERSCORE
-    textAttributes.effectColor = textAttributes.foregroundColor
-    return textAttributes
+    return textAttributesOf(severity).clone().apply {
+        effectType = EffectType.LINE_UNDERSCORE
+        effectColor = foregroundColor
+    }
 }
 
 class MyHyperlinkInfo(private val node: JsonNode) : HyperlinkInfo {
