@@ -2,6 +2,8 @@ package com.github.orangain.jsonlogviewerplugin.providers
 
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.databind.cfg.JsonNodeFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.intellij.execution.filters.ConsoleFilterProvider
 import com.intellij.execution.filters.Filter
@@ -39,7 +41,10 @@ class MyConsoleFilter : Filter {
 }
 
 val jsonPattern = Regex("""^\s*\{.*}\s*$""")
-val mapper = jacksonObjectMapper()
+val mapper = jacksonObjectMapper().apply {
+    configure(SerializationFeature.INDENT_OUTPUT, true)
+    configure(JsonNodeFeature.WRITE_PROPERTIES_SORTED, true)
+}
 
 fun parseJson(text: String): JsonNode? {
     if (!jsonPattern.matches(text)) {
@@ -64,7 +69,11 @@ fun textAttributesOf(severity: String?): TextAttributes {
 class MyHyperlinkInfo(private val node: JsonNode) : HyperlinkInfo {
     override fun navigate(project: Project) {
         val popup = JBPopupFactory.getInstance()
-            .createHtmlTextBalloonBuilder("<pre><code>${node.toPrettyString()}</code></pre>", MessageType.INFO, null)
+            .createHtmlTextBalloonBuilder(
+                "<pre><code>${mapper.writeValueAsString(node)}</code></pre>",
+                MessageType.INFO,
+                null
+            )
             .setPointerSize(Dimension(1, 1)) // Don't show the arrow
             .createBalloon()
 
