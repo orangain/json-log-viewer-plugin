@@ -12,6 +12,7 @@ import com.intellij.execution.process.ConsoleHighlighter
 import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.execution.ui.RunContentManager
 import com.intellij.openapi.diagnostic.thisLogger
+import com.intellij.openapi.editor.markup.EffectType
 import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.MessageType
@@ -30,13 +31,15 @@ class MyConsoleFilter : Filter {
         thisLogger().debug("entireLength: $entireLength, applyFilter: $line")
         val node = parseJson(line) ?: return null
 
-        val textAttributes = textAttributesOf(node.get("severity")?.asText())
+        val severity = node.get("severity")?.asText()
+        val textAttributes = textAttributesOf(severity)
+        val visitedTextAttributes = visitedTextAttributesOf(severity)
         return Filter.Result(
             entireLength - line.length,
             entireLength,
             MyHyperlinkInfo(node),
             textAttributes,
-            textAttributes,
+            visitedTextAttributes,
         )
     }
 }
@@ -58,7 +61,7 @@ fun parseJson(text: String): JsonNode? {
     }
 }
 
-fun textAttributesOf(severity: String?): TextAttributes {
+private fun textAttributesOf(severity: String?): TextAttributes {
     // See: https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry#LogSeverity
     return when (severity) {
         "DEBUG" -> ConsoleHighlighter.GRAY.defaultAttributes
@@ -68,6 +71,13 @@ fun textAttributesOf(severity: String?): TextAttributes {
         "ALERT", "EMERGENCY" -> ConsoleHighlighter.RED_BRIGHT.defaultAttributes
         else -> ConsoleViewContentType.NORMAL_OUTPUT_KEY.defaultAttributes
     }
+}
+
+private fun visitedTextAttributesOf(severity: String?): TextAttributes {
+    val textAttributes = textAttributesOf(severity).clone()
+    textAttributes.effectType = EffectType.LINE_UNDERSCORE
+    textAttributes.effectColor = textAttributes.foregroundColor
+    return textAttributes
 }
 
 class MyHyperlinkInfo(private val node: JsonNode) : HyperlinkInfo {
