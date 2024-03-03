@@ -50,13 +50,13 @@ class MyConsoleFilter : Filter {
     }
 }
 
-val jsonPattern = Regex("""^\s*\{.*}\s*$""")
-val mapper = jacksonObjectMapper().apply {
+private val jsonPattern = Regex("""^\s*\{.*}\s*$""")
+private val mapper = jacksonObjectMapper().apply {
     configure(SerializationFeature.INDENT_OUTPUT, true)
     configure(JsonNodeFeature.WRITE_PROPERTIES_SORTED, true)
 }
 
-fun parseJson(text: String): JsonNode? {
+private fun parseJson(text: String): JsonNode? {
     if (!jsonPattern.matches(text)) {
         return null
     }
